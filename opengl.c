@@ -65,6 +65,7 @@ int main(int argc, char **argv)
     printf("success.\n");
     
     SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | SDL_FULLSCREEN );
+    SDL_ShowCursor(0);
 
     glDisable(GL_DEPTH_TEST);
 
