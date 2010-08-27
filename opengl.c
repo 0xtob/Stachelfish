@@ -6,25 +6,50 @@
 #include "demo.vsh.h"
 #include "demo.fsh.h"
 
+#define WITH_GL_ERROR
+
+#ifdef WITH_GL_ERROR
+#define CHECK_GL() { \
+	GLenum err = glGetError();   \
+	while (err != GL_NO_ERROR) { \
+            fprintf(stderr, "glError: %s caught at %s:%u\n", (char *)gluErrorString(err), __FILE__, __LINE__); \
+            err = glGetError(); \
+	} \
+}
+#else
+#define CHECK_GL()
+#endif
+
 void setShaders() 
 {
     
     GLuint v = glCreateShader(GL_VERTEX_SHADER);
+    CHECK_GL();
     GLuint f = glCreateShader(GL_FRAGMENT_SHADER);	
+    CHECK_GL();
     
     glShaderSource(v, 1, &vertexShader, NULL);
+    CHECK_GL();
     glShaderSource(f, 1, &fragmentShader, NULL);
+    CHECK_GL();
     
     glCompileShader(v);
+    CHECK_GL();
     glCompileShader(f);
+    CHECK_GL();
     
     GLuint p = glCreateProgram();
+    CHECK_GL();
     
     glAttachShader(p,v);
+    CHECK_GL();
     glAttachShader(p,f);
+    CHECK_GL();
     
     glLinkProgram(p);
+    CHECK_GL();
     glUseProgram(p);
+    CHECK_GL();
 }
 
 int main(int argc, char **argv)

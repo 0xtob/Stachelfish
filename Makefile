@@ -30,6 +30,7 @@ final.lzma: $(EXEC)
 	@wc -c $@
 
 osx:
+	./convert-shader.py
 	gcc -I/opt/local/include opengl.c -o opengl -L/opt/local/lib -lSDLmain -lSDL -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
 
 clean:
