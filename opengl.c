@@ -80,7 +80,8 @@ int main(int argc, char **argv)
 
     printf("success.\n");
     
-    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | SDL_FULLSCREEN );
+    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | !SDL_FULLSCREEN);
     SDL_ShowCursor(0);
 
     glDisable(GL_DEPTH_TEST);
@@ -107,7 +108,7 @@ int main(int argc, char **argv)
         }
 
         Uint32 ticks = SDL_GetTicks();
-        glUniform1f(time, (float)ticks / 500.0);
+        glUniform1f(time, (float)ticks / 1000.0);
         glRecti(-1, -1, 1, 1);
 
         SDL_GL_SwapBuffers();
