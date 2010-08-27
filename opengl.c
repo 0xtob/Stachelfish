@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
     printf("success.\n");
     
-    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL );
+    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | SDL_FULLSCREEN );
     
     while (1)
     {
@@ -23,6 +23,7 @@ int main(int argc, char **argv)
         {
             switch(event.type)
             {
+            case SDL_KEYDOWN:
             case SDL_QUIT:
                 SDL_Quit();
                 exit(0);
