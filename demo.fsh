@@ -1,6 +1,4 @@
-uniform float time;
-
-varying vec4 p;
+uniform float t;
 
 float width = 800.0;
 float height = 450.0;
@@ -27,19 +25,19 @@ float twospherefunc(vec3 p) {
 }
 
 float spikedsphere(vec3 p) {
-	float spikeheight = sin(time)*0.2;
+	float spikeheight = sin(t)*0.2;
 	float spikefreq = 20.0;
 	float d1 = length(p - sphere_center) - sphere_radius;
 	vec3 diff = normalize(p - sphere_center);
-	float offx = spikeheight*sin(spikefreq*diff.x+time);
-	float offy = spikeheight*sin(spikefreq*diff.y+time);
+	float offx = spikeheight*sin(spikefreq*diff.x+t);
+	float offy = spikeheight*sin(spikefreq*diff.y+t);
 	return d1 + offx + offy;
 }
 
 float blubsphere(vec3 p) {
 	float sphere_radius = 1.0;
 	float dist = length(p - sphere_center) - sphere_radius;
-	float off = 1.0*sin(2.0*p.y+time);
+	float off = 1.0*sin(2.0*p.y+t);
 	return dist + off;
 }
 
@@ -91,7 +89,8 @@ void main()
 	float s = 1.0, min_step = 0.05;
 	int i = 0, imax = 30;
 	while( (s > min_step) && (i < imax) ){
-		s = spikedsphere(ray_s);
+//		s = spikedsphere(ray_s);
+		s = blubsphere(ray_s);
 		ray_s += vec3(ray.xyz) * s;
 		i++;
 	}

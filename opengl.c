@@ -20,6 +20,8 @@
 #define CHECK_GL()
 #endif
 
+GLuint p;
+
 void setShaders() 
 {
     
@@ -38,7 +40,7 @@ void setShaders()
     glCompileShader(f);
     CHECK_GL();
     
-    GLuint p = glCreateProgram();
+    p = glCreateProgram();
     CHECK_GL();
     
     glAttachShader(p,v);
@@ -67,7 +69,8 @@ int main(int argc, char **argv)
     glDisable(GL_DEPTH_TEST);
 
     setShaders();
-    
+    GLint time = glGetUniformLocation(p, "t");
+
     while (1)
     {
         SDL_Event event;
@@ -86,6 +89,8 @@ int main(int argc, char **argv)
             }
         }
 
+        Uint32 ticks = SDL_GetTicks();
+        glUniform1f(time, (float)ticks / 500.0);
         glRecti(-1, -1, 1, 1);
 
         SDL_GL_SwapBuffers();
