@@ -33,6 +33,10 @@ osx:
 	./convert-shader.py
 	gcc -I/opt/local/include opengl.c -o opengl -L/opt/local/lib -lSDLmain -lSDL -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
 
+linux:
+	./convert-shader.py
+	gcc opengl.c -o opengl -lSDL -lGL -lGLU
+
 clean:
 	rm -f *.o $(EXEC) $(EXEC).gz final
 
