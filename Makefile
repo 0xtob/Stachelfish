@@ -29,6 +29,8 @@ final.lzma: $(EXEC)
 	@rm -f $<.lzma
 	@wc -c $@
 
+osx:
+	gcc -I/opt/local/include opengl.c -o opengl -L/opt/local/lib -lSDLmain -lSDL -framework Foundation -framework Carbon -framework AppKit
 
 clean:
 	rm -f *.o $(EXEC) $(EXEC).gz final

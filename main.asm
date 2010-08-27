@@ -7,8 +7,8 @@ BITS 64
 CPU X64
 
 %include "define.asm"
-%include "elf.asm"
-
+;; %include "elf.asm"
+        
 segment .text vstart=Elf_vbase
 TEXT:
 ; {{{ Elf Headers
