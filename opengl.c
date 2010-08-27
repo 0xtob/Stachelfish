@@ -2,6 +2,7 @@
 #include <SDL/SDL_opengl.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "demo.vsh.h"
 #include "demo.fsh.h"
@@ -21,6 +22,21 @@
 #endif
 
 GLuint p;
+GLuint tex;
+
+inline void setTextures()
+{
+    unsigned char data[512];
+    int i;
+    for (i=0; i<512; ++i)
+        data[i] = random();
+    glGenTextures(1, &tex);
+    CHECK_GL();
+    glBindTexture(GL_TEXTURE_1D, tex);
+    CHECK_GL();
+    glTexImage1D(GL_TEXTURE_1D, 0, GL_LUMINANCE, 512, 0, GL_R, GL_UNSIGNED_BYTE, data);
+    CHECK_GL();
+}
 
 void setShaders() 
 {

@@ -1,4 +1,8 @@
+//#version 130
+//#extension GL_EXT_gpu_shader4 : require
+
 uniform float t;
+//uniform isampler1DArray p;
 
 float width = 800.0;
 float height = 450.0;
@@ -8,6 +12,45 @@ vec3 sphere_center = vec3(0.0, 0.0, -3.0);
 float sphere_radius = 1.5;
 
 vec3 light = vec3(2.0, 2.0, 0.0);
+
+//float fade(float t) { return t * t * t * (t * (t * 6.0 - 15.0) + 10.0); }
+//
+//float lerp(float t, float a, float b) { return a + t * (b - a); }
+//
+//float grad(int hash, vec3 vec)
+//{
+//      int h = hash & 15;
+//      float
+//          u = h<8 ? vec.x : vec.y,
+//          v = h<4 ? vec.y : h==12||h==14 ? vec.x : vec.z;
+//      return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
+//}
+
+//float noise(vec3 vec) 
+//{
+//    ivec3 V  = ivec3(floor(vec)) & 255;
+//    vec -= floor(vec);
+//
+//    float
+//        u = fade(vec.x),
+//        v = fade(vec.y),
+//        w = fade(vec.z);
+//    int A = texture1D(p, float(V.x)) + float(V.y), 
+//        AA = texture1D(p,A)+V.z
+//        AB = texture1D(p,A+1)+V.z,
+//        B = texture1D(p,V.x+1)+V.y,
+//        BA = texture1D(p,B)+V.z,
+//        BB = texture1D(p,B+1)+V.z;
+//
+//    return lerp(w, lerp(v, lerp(u, grad(texture1D(p,AA), x  , y  , z   ),
+//                                grad(texture1D(p,BA), x-1, y  , z   )),
+//                        lerp(u, grad(texture1D(p,AB), x  , y-1, z   ),
+//                             grad(texture1D(p,BB), x-1, y-1, z   ))),
+//                lerp(v, lerp(u, grad(texture1D(p,AA+1), x  , y  , z-1 ),
+//                             grad(texture1D(p,BA+1), x-1, y  , z-1 )),
+//                     lerp(u, grad(texture1D(p,AB+1), x  , y-1, z-1 ),
+//                          grad(texture1D(p,BB+1), x-1, y-1, z-1 ))));
+//}
 
 float spherefunc(vec3 p) {
 	return length(p - sphere_center) - sphere_radius;
@@ -89,8 +132,8 @@ void main()
 	float s = 1.0, min_step = 0.05;
 	int i = 0, imax = 30;
 	while( (s > min_step) && (i < imax) ){
-//		s = spikedsphere(ray_s);
-		s = blubsphere(ray_s);
+		s = spikedsphere(ray_s);
+//		s = blubsphere(ray_s);
 		ray_s += vec3(ray.xyz) * s;
 		i++;
 	}
