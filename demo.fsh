@@ -1,6 +1,3 @@
-// simple fragment shader
-
-// 'time' contains seconds since the program was linked.
 uniform float time;
 
 varying vec4 p;
@@ -36,7 +33,6 @@ float spikedsphere(vec3 p) {
 	vec3 diff = normalize(p - sphere_center);
 	float offx = spikeheight*sin(spikefreq*diff.x+time);
 	float offy = spikeheight*sin(spikefreq*diff.y+time);
-	//float off = 0.2 * sin(p.y * 6.0 + 3*time);
 	return d1 + offx + offy;
 }
 
@@ -78,16 +74,12 @@ float colspherefunc(vec3 p) {
 
 void main()
 {
-	// Matrices are given in column-major order
-    // (What you see here is thus transposed.
 	mat4 m_cam = mat4(2.0 * aspect / width, 0.0,          0.0, 0.0,
                       0.0,         2.0 / height, 0.0, 0.0,
                       0.0,         0.0,          0.0, 0.0,
                      -1.0 * aspect,        -1.0,         -1.0, 1.0);
 
 	vec4 ray = m_cam * gl_FragCoord;
-	//ray.z += 0.1*sin(3.0*ray.y+7.0*p.x);
-	//ray.x += 0.1*sin(3.0*ray.y+3.0*p.x);
 	ray = normalize(ray);
 
 	vec3 ray_s = vec3(ray);
@@ -96,45 +88,22 @@ void main()
 	int n_steps = int(maxdepth / stepwidth);
 	vec3 ray_inc = ray_s * stepwidth;
 
-	// Raymarching
 	float s = 1.0, min_step = 0.05;
 	int i = 0, imax = 30;
 	while( (s > min_step) && (i < imax) ){
 		s = spikedsphere(ray_s);
-		// We're s units away, so we can advance by
-		// at least s units.
 		ray_s += vec3(ray.xyz) * s;
 		i++;
 	}
 
-	// Debug: Show n steps
-	//float c = float(i)/10 ;
-	//gl_FragColor = vec4(c,c,c,1.0);
-	//return;
-
 	if(s <= min_step) {
 		vec3 normal = spherenormal(ray_s);
-		//vec3 normal = columnnormal(ray_s);
 		vec3 lightdir = normalize(light - ray_s);
 		float diffuse = dot(normal, lightdir);
 		gl_FragColor = vec4(diffuse,diffuse,diffuse,1.0);
 		return;
 	}
 
-	/*
-	// Straightforward raycasting
-	for(int i=0; i < n_steps; i++) {
-		if(spherefunc(ray_s) < 0.0) {
-			vec3 normal = spherenormal(ray_s);
-			float diffuse = dot(normal, normalize(light - ray_s));
-			gl_FragColor = vec4(diffuse,diffuse,diffuse,1.0);
-			return;
-		}
-		ray_s += ray_inc;
-	}
-	*/
-
-	// Background
 	float z = -ray.z;
 	gl_FragColor = vec4(z,z,z,1.0);
 }
