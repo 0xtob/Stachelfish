@@ -7,7 +7,7 @@ def convertShader(name, in_filename, out_filename):
     for line in shader_in:
         shader_out.write(line.strip())
         shader_out.write("\\\n")
-    shader_out.write("\";")
+    shader_out.write("\";\n")
     shader_in.close()
     shader_out.close()
 
