@@ -7,8 +7,10 @@ def convertShader(name, in_filename, out_filename):
     shader_out = open(out_filename, "w");
     shader_out.write("const char *%s = \"" % (name))
     for line in shader_in:
-        shader_out.write(re.sub("//.*", "", line.strip()))
-        shader_out.write("\\\n")
+        line = re.sub("//.*", "", line).strip()
+        if len(line) > 0:
+            shader_out.write(line)
+            shader_out.write("\\\n")
     shader_out.write("\";\n")
     shader_in.close()
     shader_out.close()
