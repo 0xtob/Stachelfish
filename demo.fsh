@@ -22,15 +22,14 @@ vec3 spherenormal(vec3 p) {
 	return normalize(p - sphere_center);
 }
 
-vec3 twospherefunc(vec3 p) {
-	vec3 sphere_center2 = vec3(sphere_center.x-1, sphere_center.y, sphere_center.z);
+float twospherefunc(vec3 p) {
+	vec3 sphere_center2 = vec3(sphere_center.x-1.0, sphere_center.y, sphere_center.z);
 	float d1 = length(p - sphere_center) - sphere_radius;
 	float d2 = length(p - sphere_center2) - sphere_radius;
 	return min(d1, d2);
-//	return min(d1, d2);
 }
 
-vec3 spikedsphere(vec3 p) {
+float spikedsphere(vec3 p) {
 	float spikeheight = sin(time)*0.2;
 	float spikefreq = 20.0;
 	float d1 = length(p - sphere_center) - sphere_radius;
@@ -41,22 +40,15 @@ vec3 spikedsphere(vec3 p) {
 	return d1 + offx + offy;
 }
 
-vec3 blubsphere(vec3 p) {
+float blubsphere(vec3 p) {
 	float sphere_radius = 1.0;
 	float dist = length(p - sphere_center) - sphere_radius;
-	float off = 1*sin(2*p.y+time);
+	float off = 1.0*sin(2.0*p.y+time);
 	return dist + off;
 }
 
 float manyspherefunc(vec3 q) {
 	return spherefunc(vec3(mod(q.x,2.0), q.y, -mod(-q.z, 4.0)));
-	//float d1 = spherefunc(q);
-	//float d2 = spherefunc(q+vec3(p.x*3,0.0,0.0));
-	//if( (d1 < 0.5) && (d2 < 0.5) ) {
-	//return min(d1,d2);
-	//} else {
-	//	return max(d1, d2);
-	//}
 }
 
 vec3 colpos = vec3(0.0,0.0,-3.0);
@@ -77,7 +69,7 @@ float colspherefunc(vec3 p) {
 	float d1 = columnfunc(p);
 	float d2 = spherefunc(p);
 	if((d1 < 0.3) && (d2 < 0.3)) {
-		float s = smoothstep(0, 1, length(p));
+		float s = smoothstep(0.0, 1.0, length(p));
 		return mix(d1, d2, s);
 	} else {
 		return min(d1,d2);
@@ -111,7 +103,7 @@ void main()
 		s = spikedsphere(ray_s);
 		// We're s units away, so we can advance by
 		// at least s units.
-		ray_s += ray * s;
+		ray_s += vec3(ray.xyz) * s;
 		i++;
 	}
 
