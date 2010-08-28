@@ -30,13 +30,22 @@ inline void setTextures()
 {
     unsigned char data[512];
     int i;
-    for (i=0; i<512; ++i)
-        data[i] = random();
+    for (i=0; i<512; ++i) {
+        data[i] = (unsigned char)((random() / (float)RAND_MAX) * 255);
+    }
     glGenTextures(1, &tex);
+    CHECK_GL();
+    glActiveTexture(GL_TEXTURE0);
     CHECK_GL();
     glBindTexture(GL_TEXTURE_1D, tex);
     CHECK_GL();
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_LUMINANCE, 512, 0, GL_R, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    CHECK_GL();
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    CHECK_GL();
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+    CHECK_GL();
+    glTexImage1D(GL_TEXTURE_1D, 0, GL_INTENSITY8UI_EXT, 512, 0, GL_LUMINANCE_INTEGER_EXT, GL_UNSIGNED_BYTE, data);
     CHECK_GL();
 }
 
@@ -100,6 +109,9 @@ int main(int argc, char **argv)
     setTextures();
     GLint my_time = glGetUniformLocation(p, "t");
     CHECK_GL();
+    GLint my_tex = glGetUniformLocation(p, "p");
+    CHECK_GL();
+    glUniform1i(my_tex, 0);
 
     while (1)
     {

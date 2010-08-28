@@ -28,28 +28,28 @@ float grad(int hash, vec3 vec)
 
 float noise(vec3 vec) 
 {
-    ivec3 V = ivec3(floor(vec)) & 255;
-    vec -= floor(vec);
+   ivec3 V = ivec3(floor(vec)) & 255;
+   vec -= floor(vec);
 
-    float
-        u = fade(vec.x),
-        v = fade(vec.y),
-        w = fade(vec.z);
-    int A = texture1D(p,V.x).x+V.y, 
-        AA = texture1D(p,A).x+V.z,
-        AB = texture1D(p,A+1).x+V.z,
-        B = texture1D(p,V.x+1).x+V.y,
-        BA = texture1D(p,B).x+V.z,
-        BB = texture1D(p,B+1).x+V.z;
+   float
+       u = fade(vec.x),
+       v = fade(vec.y),
+       w = fade(vec.z);
+   int A = texture1D(p,V.x).x+V.y, 
+       AA = texture1D(p,A).x+V.z,
+       AB = texture1D(p,A+1).x+V.z,
+       B = texture1D(p,V.x+1).x+V.y,
+       BA = texture1D(p,B).x+V.z,
+       BB = texture1D(p,B+1).x+V.z;
 
-    return lerp(w, lerp(v, lerp(u, grad(texture1D(p,AA).x,vec3(vec.x,vec.y,vec.z)),
-                                grad(texture1D(p,BA).x,vec3(vec.x-1,vec.y,vec.z))),
-                        lerp(u, grad(texture1D(p,AB).x,vec3(vec.x,vec.y-1,vec.z)),
-                             grad(texture1D(p,BB).x,vec3(vec.x-1,vec.y-1,vec.z)))),
-                lerp(v, lerp(u, grad(texture1D(p,AA+1).x,vec3(vec.x,vec.y,vec.z-1)),
-                             grad(texture1D(p,BA+1).x,vec3(vec.x-1,vec.y,vec.z-1))),
-                     lerp(u, grad(texture1D(p,AB+1).x,vec3(vec.x,vec.y-1,vec.z-1)),
-                          grad(texture1D(p,BB+1).x,vec3(vec.x-1,vec.y-1,vec.z-1)))));
+   return lerp(w, lerp(v, lerp(u, grad(texture1D(p,AA).x,vec3(vec.x,vec.y,vec.z)),
+                               grad(texture1D(p,BA).x,vec3(vec.x-1,vec.y,vec.z))),
+                       lerp(u, grad(texture1D(p,AB).x,vec3(vec.x,vec.y-1,vec.z)),
+                            grad(texture1D(p,BB).x,vec3(vec.x-1,vec.y-1,vec.z)))),
+               lerp(v, lerp(u, grad(texture1D(p,AA+1).x,vec3(vec.x,vec.y,vec.z-1)),
+                            grad(texture1D(p,BA+1).x,vec3(vec.x-1,vec.y,vec.z-1))),
+                    lerp(u, grad(texture1D(p,AB+1).x,vec3(vec.x,vec.y-1,vec.z-1)),
+                         grad(texture1D(p,BB+1).x,vec3(vec.x-1,vec.y-1,vec.z-1)))));
 }
 
 float spherefunc(vec3 p) {
