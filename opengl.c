@@ -1,10 +1,12 @@
 #include <GL/glew.h>
 
+#include <GL/gl.h>
+
 #define NO_SDL_GLEXT
 #include <SDL/SDL.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 
 #include "demo.vsh.h"
 #include "demo.fsh.h"
@@ -39,7 +41,7 @@ inline void setTextures()
     CHECK_GL();
     glBindTexture(GL_TEXTURE_1D, tex);
     CHECK_GL();
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    //glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     CHECK_GL();
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     CHECK_GL();
@@ -82,28 +84,30 @@ void setShaders()
 }
 
 int main(int argc, char **argv)
+//void _start()
 {
-    if( SDL_Init( SDL_INIT_VIDEO ) != 0 )
-    {
-        printf("failed to init SDL.\n");
-        return 1;
-    }
+//    if( SDL_Init( SDL_INIT_VIDEO ) != 0 )
+//    {
+//        printf("failed to init SDL.\n");
+//        return 1;
+//    }
+    SDL_Init( SDL_INIT_VIDEO );
 
-    printf("success.\n");
+    //printf("success.\n");
     
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL ); //| SDL_FULLSCREEN);
+    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | SDL_FULLSCREEN);
     SDL_ShowCursor(0);
 
-    GLenum err = glewInit();
+    glewInit();
 
-    if (GLEW_OK != err)
-    {
-        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-        return 1;
-    }
+    //if (GLEW_OK != err)
+    //{
+    //    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+    //    return 1;
+    //}
 
-    glDisable(GL_DEPTH_TEST);
+    //glDisable(GL_DEPTH_TEST);
 
     setShaders();
     setTextures();
@@ -113,7 +117,8 @@ int main(int argc, char **argv)
     CHECK_GL();
     glUniform1i(my_tex, 0);
 
-    while (1)
+    Uint32 ticks = 0;
+    while (ticks < 1000*60)
     {
         SDL_Event event;
 
@@ -131,8 +136,8 @@ int main(int argc, char **argv)
             }
         }
 
-        Uint32 ticks = SDL_GetTicks();
-        glUniform1f(my_time, ticks/1000.0);
+        ticks = SDL_GetTicks();
+        glUniform1f(my_time, ticks>>10);
         CHECK_GL();
         glRecti(-1, -1, 1, 1);
         CHECK_GL();

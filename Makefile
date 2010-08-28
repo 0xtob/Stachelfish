@@ -31,11 +31,12 @@ final.lzma: $(EXEC)
 
 osx:
 	./convert-shader.py
-	gcc -I/opt/local/include opengl.c -o opengl -L/opt/local/lib -lSDLmain -lSDL -lGLEW -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
+	gcc -Oz -I/opt/local/include opengl.c -o opengl -L/opt/local/lib -lSDLmain -lSDL -lGLEW -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
+	strip opengl
 
 linux:
 	./convert-shader.py
-	gcc opengl.c -o opengl -lSDL -lGL -lGLU -lGLEW
+	gcc -Os -fexpensive-optimizations -fpeephole2 opengl.c -o opengl -lSDL -lGL -lGLEW -lGLU && strip opengl && ./sstrip opengl && rm opengl.lzma && lzma --best --keep opengl && cat lzunpack.header opengl.lzma > opengl.demo && ls -l opengl.demo
 
 clean:
 	rm -f *.o $(EXEC) $(EXEC).gz final
