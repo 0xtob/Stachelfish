@@ -11,10 +11,11 @@ float aspect = width / height;
 vec3 sphere_center = vec3(0.0, 0.0, -3.0);
 float sphere_radius = 1.5;
 
-vec3 light = vec3(2.0, 2.0, 0.0);
+vec3 light = vec3(sin(t), cos(t), 0.0);
 
 float fade(float t) { return t * t * t * (t * (t * 6.0 - 15.0) + 10.0); }
 
+vec4 lerp(float t, vec4 a, vec4 b) { return a + t * (b - a); }
 float lerp(float t, float a, float b) { return a + t * (b - a); }
 
 float grad(int hash, vec3 vec)
@@ -141,11 +142,13 @@ void main()
 	if(s <= min_step) {
 		vec3 normal = spherenormal(ray_s);
 		vec3 lightdir = normalize(light - ray_s);
-		float diffuse = dot(normal, lightdir) * noise(ray_s * 10.0);
-		gl_FragColor = vec4(diffuse,diffuse,diffuse,1.0);
+                gl_FragColor = dot(normal, lightdir) 
+                    * lerp(noise((ray_s - vec3(0.1*t, 0.1, -0.1)) * 10.0),
+                           vec4(1.0,0.6,0.25,1.0),
+                           vec4(1.0,1.0,1.0,1.0));
 		return;
 	}
 
 	float z = -ray.z;
-	gl_FragColor = vec4(z,z,z,1.0);
+	gl_FragColor = lerp(noise(ray.xyz * 3.0 + vec3(t,0.0,0.0)), vec4(0.07,0.15,0.25,1.0), vec4(1.0));
 }
