@@ -2,7 +2,6 @@
 
 #define NO_SDL_GLEXT
 #include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +9,7 @@
 #include "demo.vsh.h"
 #include "demo.fsh.h"
 
-#define WITH_GL_ERROR
+#undef WITH_GL_ERROR
 
 #ifdef WITH_GL_ERROR
 #define CHECK_GL() { \
@@ -88,6 +87,7 @@ int main(int argc, char **argv)
     SDL_ShowCursor(0);
 
     GLenum err = glewInit();
+
     if (GLEW_OK != err)
     {
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
@@ -97,6 +97,7 @@ int main(int argc, char **argv)
     glDisable(GL_DEPTH_TEST);
 
     setShaders();
+    setTextures();
     GLint my_time = glGetUniformLocation(p, "t");
     CHECK_GL();
 
