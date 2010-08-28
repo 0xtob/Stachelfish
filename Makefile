@@ -35,8 +35,17 @@ osx:
 	strip opengl
 
 linux:
+	make -C music
 	./convert-shader.py
-	gcc -Os -fexpensive-optimizations -fpeephole2 opengl.c -o opengl -lSDL -lGL -lGLEW -lGLU && strip opengl && ./sstrip opengl && rm opengl.lzma && lzma --best --keep opengl && cat lzunpack.header opengl.lzma > opengl.demo && ls -l opengl.demo
+	nasm -f elf64 start.asm
+	gcc -Os -fexpensive-optimizations -fpeephole2 -c opengl.c -o opengl.o
+	gcc -Os -fexpensive-optimizations -fpeephole2 -nostdlib -nostartfiles start.o opengl.o -o opengl -lSDL -lGL -lGLEW -lGLU
+	strip opengl
+	./sstrip opengl
+	rm opengl.lzma
+	lzma --best --keep opengl
+	cat lzunpack.header opengl.lzma > stachelfish
+	ls -l stachelfish
 
 clean:
 	rm -f *.o $(EXEC) $(EXEC).gz final

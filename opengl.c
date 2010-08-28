@@ -10,6 +10,7 @@
 
 #include "demo.vsh.h"
 #include "demo.fsh.h"
+#include "music/data.h"
 
 #undef WITH_GL_ERROR
 
@@ -27,6 +28,8 @@
 
 GLuint p;
 GLuint tex;
+
+SDL_AudioSpec wanted;
 
 inline void setTextures()
 {
@@ -83,8 +86,38 @@ void setShaders()
     CHECK_GL();
 }
 
-int main(int argc, char **argv)
-//void _start()
+float sval = 0;
+long t = 0;
+
+int pcount = 0;
+
+short notes[5] = {220, 262, 349, 262, 330};
+int n = 0;
+
+void player_call(void *udata, int1u *stream, int4 len) {
+    int i;
+//    float freq = 220.0 + sin((float)t/44100.0) * 80;
+//float freq = (pcount % 2) ? 220 : 262;
+float freq = notes[n];
+    float slope = freq / 44100.0;
+    for(i=0; i<len/2; ++i) {
+
+    float lastton = 0.0;
+    sval = sval + slope;
+    if(sval > 2.0) sval -= 2.0;
+        float ton = (sval > 1.0) ? 32767.0 : -32767.0;
+        double hull = sin( (float)t / 44100.0 );
+        ton = 0.5*(ton + lastton);
+        ((int2*)stream)[i] = (short)(ton * hull);
+        t++;
+        if(t > 138544) {
+            t=0; pcount++; n++; if(n==5) n = 0;}
+        lastton = ton;
+    }
+}
+
+//int main(int argc, char **argv)
+void mystart()
 {
 //    if( SDL_Init( SDL_INIT_VIDEO ) != 0 )
 //    {
@@ -100,6 +133,17 @@ int main(int argc, char **argv)
     SDL_ShowCursor(0);
 
     glewInit();
+
+    wanted.freq = 44100;
+    wanted.format = AUDIO_S16; // 16 bit signed
+    wanted.channels = 1;
+    wanted.samples = 2048;
+    wanted.callback = player_call;
+    wanted.userdata = NULL;
+
+    SDL_OpenAudio(&wanted, NULL);
+
+    SDL_PauseAudio(0);
 
     //if (GLEW_OK != err)
     //{
@@ -118,7 +162,8 @@ int main(int argc, char **argv)
     glUniform1i(my_tex, 0);
 
     Uint32 ticks = 0;
-    while (ticks < 1000*60)
+    int quit = 0;
+    while ((ticks < 1000*60) && (quit == 0))
     {
         SDL_Event event;
 
@@ -128,16 +173,17 @@ int main(int argc, char **argv)
             {
             case SDL_KEYDOWN:
             case SDL_QUIT:
-                SDL_Quit();
-                exit(0);
-                break;
+                //SDL_Quit();
+                //exit(0);
+                quit = 1;
+                //break;
             default:
                 break;
             }
         }
 
         ticks = SDL_GetTicks();
-        glUniform1f(my_time, ticks>>10);
+        glUniform1f(my_time, ticks / 1000.0);
         CHECK_GL();
         glRecti(-1, -1, 1, 1);
         CHECK_GL();
@@ -145,7 +191,9 @@ int main(int argc, char **argv)
         SDL_GL_SwapBuffers();
     }
 
+    SDL_CloseAudio();
+
     SDL_Quit();
     
-    return 0;
+    //return 0;
 }
