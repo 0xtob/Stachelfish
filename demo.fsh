@@ -141,7 +141,7 @@ void main()
 	if(s <= min_step) {
 		vec3 normal = spherenormal(ray_s);
 		vec3 lightdir = normalize(light - ray_s);
-		float diffuse = dot(normal, lightdir);
+		float diffuse = dot(normal, lightdir) * noise(ray_s * 10.0);
 		gl_FragColor = vec4(diffuse,diffuse,diffuse,1.0);
 		return;
 	}
