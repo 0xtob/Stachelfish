@@ -1,3 +1,6 @@
+#include <GL/glew.h>
+
+#define NO_SDL_GLEXT
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 
@@ -81,13 +84,21 @@ int main(int argc, char **argv)
     printf("success.\n");
     
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | !SDL_FULLSCREEN);
+    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL ); //| SDL_FULLSCREEN);
     SDL_ShowCursor(0);
+
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
+    {
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+        return 1;
+    }
 
     glDisable(GL_DEPTH_TEST);
 
     setShaders();
-    GLint time = glGetUniformLocation(p, "t");
+    GLint my_time = glGetUniformLocation(p, "t");
+    CHECK_GL();
 
     while (1)
     {
@@ -108,8 +119,10 @@ int main(int argc, char **argv)
         }
 
         Uint32 ticks = SDL_GetTicks();
-        glUniform1f(time, (float)ticks / 1000.0);
+        glUniform1f(my_time, ticks/1000.0);
+        CHECK_GL();
         glRecti(-1, -1, 1, 1);
+        CHECK_GL();
 
         SDL_GL_SwapBuffers();
     }
