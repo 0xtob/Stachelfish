@@ -1,6 +1,8 @@
 #version 120
 #extension GL_EXT_gpu_shader4 : enable
 
+#define clamp0(x) (x > 0.0 ? x : 0)
+
 uniform float t;
 uniform isampler1D p;
 
@@ -11,7 +13,8 @@ float aspect = width / height;
 vec3 sphere_center = vec3(0.0, 0.0, -3.0);
 float sphere_radius = 1.5;
 
-vec3 light = vec3(sin(t), cos(t), 0.0);
+vec3 light1 = vec3(sin(t), cos(t), 0.0);
+vec3 light2 = vec3(-sin(t), sin(t), cos(t));
 
 float fade(float t) { return t * t * t * (t * (t * 6.0 - 15.0) + 10.0); }
 
@@ -133,20 +136,21 @@ void main()
 	float s = 1.0, min_step = 0.05;
 	int i = 0, imax = 30;
 	while( (s > min_step) && (i < imax) ){
-		s = spikedsphere(ray_s);
-//		s = blubsphere(ray_s);
-		ray_s += vec3(ray.xyz) * s;
-		i++;
+            s = lerp((sin(t)+1.0)/2.0,spikedsphere(ray_s), blubsphere(ray_s));
+            ray_s += vec3(ray.xyz) * s;
+            i++;
 	}
 
 	if(s <= min_step) {
-		vec3 normal = spherenormal(ray_s);
-		vec3 lightdir = normalize(light - ray_s);
-                gl_FragColor = dot(normal, lightdir) 
-                    * lerp(noise((ray_s - vec3(0.1*t, 0.1, -0.1)) * 10.0),
-                           vec4(1.0,0.6,0.25,1.0),
-                           vec4(1.0,1.0,1.0,1.0));
-		return;
+            vec3 normal = spherenormal(ray_s);
+            vec3 lightdir1 = normalize(light1 - ray_s);
+            vec3 lightdir2 = normalize(light2 - ray_s);
+            gl_FragColor = (clamp0(dot(normal,lightdir1))*vec4(1.0)
+                            + clamp0(dot(normal,lightdir2))*vec4(0.1,0.8,0.9,1.0))
+                * lerp(noise((ray_s - vec3(0.1*t, 0.1, -0.1)) * 10.0),
+                       vec4(1.0,0.6,0.25,1.0),
+                       vec4(1.0,1.0,1.0,1.0));
+            return;
 	}
 
 	float z = -ray.z;
