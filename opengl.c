@@ -1,22 +1,21 @@
-#ifndef GLXEXT
-#include <GL/glew.h>
-#else
+#ifdef GLXEXT
 #include <GL/glx.h>
 #endif
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
-
-#ifndef GLXEXT
-#define NO_SDL_GLEXT
 #endif
+
 #include <SDL/SDL.h>
 
-//#include <stdlib.h>
+//#include <stdlib.h> // this is in theory needed for random(). why comment it out?
+#include <math.h>
 
 #include "demo.vsh.h"
 #include "demo.fsh.h"
-#include "data.h"
-#include "math.h"
+#include "data.h" // hint: this is what stdint.h is for -> C99
 
 #undef WITH_GL_ERROR
 
@@ -144,9 +143,7 @@ int main()
     //SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL | SDL_FULLSCREEN);
     SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL);
     SDL_ShowCursor(0);
-#ifndef GLXEXT
-    glewInit();
-#endif
+
     sdlaudio.freq = 44100;
     sdlaudio.format = AUDIO_S16; // 16 bit signed
     sdlaudio.channels = 1;

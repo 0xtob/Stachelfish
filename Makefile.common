@@ -1,9 +1,9 @@
 #! /usr/bin/make
 
 CC = gcc
-CFLAGS = -Os -fexpensive-optimizations -fpeephole2 `sdl-config --cflags`
+CFLAGS = -Os -fexpensive-optimizations -fpeephole2
 BOLD=./tools/bold-0.2.1/bold
-LIB = `sdl-config --libs` -lm
+LIB = -lm
 
 EXEC = stachelfish
 

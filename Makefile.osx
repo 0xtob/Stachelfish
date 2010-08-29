@@ -4,8 +4,8 @@ include Makefile.common
 
 .PHONY: small
 
-CFLAGS += -I/opt/local/include -Oz
-LIB += -L/opt/local/lib -lGLEW -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
+CFLAGS += -Oz
+LDFLAGS += -framework SDL -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
 
 small: $(EXEC)
 	strip $(EXEC)
@@ -15,4 +15,4 @@ small: $(EXEC)
 	ls -l $(EXEC).tiny
 
 $(EXEC): opengl.o
-	$(CC) $(CFLAGS) opengl.o -o $(EXEC) $(LDFLAGS) $(LIB)
+	$(CC) $(CFLAGS) opengl.o SDLMain.m -o $(EXEC) $(LDFLAGS) $(LIB)
