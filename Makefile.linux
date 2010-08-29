@@ -1,0 +1,18 @@
+#! /usr/bin/make
+
+include Makefile.common
+
+CFLAGS += -DGLXEXT
+
+small: $(EXEC)
+#	strip $(EXEC)
+#	./tools/sstrip/sstrip $(EXEC)
+	rm -f $(EXEC).lzma
+	lzma --best --keep $(EXEC)
+	cat lzunpack.header $(EXEC).lzma > $(EXEC)
+	ls -l $(EXEC)
+
+$(EXEC): opengl.o demo.vsh.h demo.fsh.h
+#	$(CC) $(CFLAGS) $(LDFLAGS) start.o opengl.o -o $(EXEC) $(LIB)
+	$(BOLD) -c -a $(LIB) -o $(EXEC) opengl.o
+
