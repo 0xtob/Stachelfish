@@ -12,5 +12,5 @@ in 26 hours:
 6h sleep, 0.5 beer, 1h error tolerance
 
 We thank iq/rgba for his great tutorials on raymarching,
-and jix/titan for providing his laptop for beaming,
-and the Evoke organizers for being just awesome!
+jix/titan for providing his laptop for beaming, and the
+Evoke organizers for being just awesome!
