@@ -11,7 +11,6 @@
 #endif
 #include <SDL/SDL.h>
 
-//#include <stdio.h>
 //#include <stdlib.h>
 
 #include "demo.vsh.h"
@@ -22,6 +21,7 @@
 #undef WITH_GL_ERROR
 
 #ifdef WITH_GL_ERROR
+#include <stdio.h>
 #define CHECK_GL() { \
 	GLenum err = glGetError();   \
 	while (err != GL_NO_ERROR) { \
