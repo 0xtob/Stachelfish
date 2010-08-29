@@ -126,8 +126,11 @@ void player_call(void *udata, int1u *stream, int4 len) {
     }
 }
 
-//void mystart()
+#ifdef __APPLE__
+int main(int argc, char **argv)
+#else
 int main()
+#endif
 {
     SDL_Init( SDL_INIT_VIDEO );
 

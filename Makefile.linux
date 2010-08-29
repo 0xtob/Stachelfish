@@ -3,6 +3,7 @@
 include Makefile.common
 
 CFLAGS += -DGLXEXT
+LDFLAGS = -nostdlib -nostartfiles -lGL -lGLEW
 
 small: $(EXEC)
 #	strip $(EXEC)

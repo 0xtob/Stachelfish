@@ -3,8 +3,7 @@
 CC = gcc
 CFLAGS = -Os -fexpensive-optimizations -fpeephole2 `sdl-config --cflags`
 BOLD=./tools/bold-0.2.1/bold
-LDFLAGS = -nostdlib -nostartfiles
-LIB = `sdl-config --libs` -lGL -lGLEW -lm
+LIB = `sdl-config --libs` -lm
 
 EXEC = stachelfish
 

@@ -2,11 +2,15 @@
 
 include Makefile.common
 
-LIB += -L/opt/local/lib -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
+CFLAGS += -I/opt/local/include -Oz
+LIB += -L/opt/local/lib -lGLEW -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
 
 small: $(EXEC)
 	strip $(EXEC)
-# TODO: OSX smallifications here!
+	rm -f $(EXEC).lzma
+	lzma --best --keep $(EXEC)
+	cat lzunpack.header $(EXEC).lzma > $(EXEC)
+	ls -l $(EXEC)
 
 $(EXEC): opengl.o
-	$(CC) -Oz -I/opt/local/include opengl.c -o $(EXEC) $(LDFLAGS) $(LIB)
+	$(CC) $(CFLAGS) opengl.o -o $(EXEC) $(LDFLAGS) $(LIB)
