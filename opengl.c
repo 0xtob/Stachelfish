@@ -106,6 +106,7 @@ float freq = notes[n];
     sval = sval + slope;
     if(sval > 2.0) sval -= 2.0;
         float ton = (sval > 1.0) ? 32767.0 : -32767.0;
+        ton *= sin(sval*5);
         double hull = sin( (float)t / 44100.0 );
         ton = 0.5*(ton + lastton);
         ((int2*)stream)[i] = (short)(ton * hull);
@@ -129,7 +130,8 @@ void mystart()
     //printf("success.\n");
     
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-    SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | SDL_FULLSCREEN);
+    SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL | SDL_FULLSCREEN);
+    //SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | SDL_FULLSCREEN);
     SDL_ShowCursor(0);
 
     glewInit();

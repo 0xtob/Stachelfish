@@ -4,8 +4,8 @@
 #define t1(x,y) (texture1D(x,y))
 uniform float t;
 uniform isampler1D p;
-float wd=800;
-float ht=450;
+float wd=1280;
+float ht=720;
 float asp=wd/ht;
 vec3 sc=vec3(0,0,-3);
 float sr=1.5;
@@ -64,16 +64,17 @@ void main()
         i++;
     }
 
+    vec4 fc=vec4(0.0);
     if(s<=ms){
         vec3 n=sn(r_s);
-        gl_FragColor=(c0(dot(n,normalize(vec3(sin(t),cos(t),0.0)-r_s)))*vec4(1.0)
-                      +c0(dot(n,normalize(vec3(-sin(t),sin(t),cos(t))-r_s)))*vec4(0.1,0.8,0.9,1.0))
+        fc=(c0(dot(n,normalize(vec3(sin(t),cos(t),0.0)-r_s)))*vec4(1.0)
+                      +c0(dot(n,normalize(vec3(-sin(t),sin(t),cos(t))-r_s)))*vec4(0.1,0.8,0.9,1.0)+0.25)
             *mix(vec4(1.0,0.6,0.25,1.0),
                  vec4(1.0,1.0,1.0,1.0),
                  ns((r_s-vec3(0.1*t,0.1,-0.1))*10.0));
-        return;
     }
 
     float z=-r.z;
-    gl_FragColor=mix(vec4(0.07,0.15,0.25,1.0),vec4(1.0),ns(r.xyz*3.0+vec3(t,0.0,0.0)));
+    vec3 c=vec3(0.407,0.615,0.725)*vec3(sin(t),sin(0.5*t),cos(0.75*t));
+    gl_FragColor=mix(vec4(c,1.0),vec4(1.0),ns(r.xyz*3.0+vec3(t,0.0,0.0))) + fc * (0.75+sin(t)*0.25);
 }
