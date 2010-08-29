@@ -1,8 +1,14 @@
+#ifndef GLXEXT
 #include <GL/glew.h>
+#else
+#include <GL/glx.h>
+#endif
 
 #include <GL/gl.h>
 
+#ifndef GLXEXT
 #define NO_SDL_GLEXT
+#endif
 #include <SDL/SDL.h>
 
 //#include <stdio.h>
@@ -10,7 +16,8 @@
 
 #include "demo.vsh.h"
 #include "demo.fsh.h"
-#include "music/data.h"
+#include "data.h"
+#include "math.h"
 
 #undef WITH_GL_ERROR
 
@@ -26,10 +33,16 @@
 #define CHECK_GL()
 #endif
 
+#ifdef GLXEXT
+PFNGLUNIFORM1FPROC glUniform1f;
+PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+#endif
+
 GLuint p;
 GLuint tex;
 
-SDL_AudioSpec wanted;
+SDL_AudioSpec sdlaudio;
 
 inline void setTextures()
 {
@@ -44,8 +57,6 @@ inline void setTextures()
     CHECK_GL();
     glBindTexture(GL_TEXTURE_1D, tex);
     CHECK_GL();
-    //glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    CHECK_GL();
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     CHECK_GL();
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
@@ -54,9 +65,8 @@ inline void setTextures()
     CHECK_GL();
 }
 
-void setShaders() 
+static void setShaders() 
 {
-    
     GLuint v = glCreateShader(GL_VERTEX_SHADER);
     CHECK_GL();
     GLuint f = glCreateShader(GL_FRAGMENT_SHADER);	
@@ -89,74 +99,65 @@ void setShaders()
 float sval = 0;
 long t = 0;
 
-int pcount = 0;
-
 short notes[5] = {220, 262, 349, 262, 330};
 int n = 0;
+float lastton = 0.0;
 
 void player_call(void *udata, int1u *stream, int4 len) {
-    int i;
-//    float freq = 220.0 + sin((float)t/44100.0) * 80;
-//float freq = (pcount % 2) ? 220 : 262;
-float freq = notes[n];
+    float freq = notes[n];
     float slope = freq / 44100.0;
+    int i;
     for(i=0; i<len/2; ++i) {
-
-    float lastton = 0.0;
-    sval = sval + slope;
-    if(sval > 2.0) sval -= 2.0;
+        sval = sval + slope;
+        if(sval > 2.0) sval -= 2.0;
         float ton = (sval > 1.0) ? 32767.0 : -32767.0;
-        ton *= sin(sval*5);
-        double hull = sin( (float)t / 44100.0 );
-        ton = 0.5*(ton + lastton);
+        ton *= sinf(sval*5.0f); // FM for phatt sound!
+        float hull = sinf( (float)t / 44100.0 );
+        ton = 0.2 * ton + 0.8 * lastton; // Lowpass for less harsh sound
         ((int2*)stream)[i] = (short)(ton * hull);
         t++;
-        if(t > 138544) {
-            t=0; pcount++; n++; if(n==5) n = 0;}
+        if(t > 138544) { // PI * 44100
+            t=0;
+            n++;
+            if(n==5)
+                n = 0;
+        }
         lastton = ton;
     }
 }
 
-//int main(int argc, char **argv)
-void mystart()
+//void mystart()
+int main()
 {
-//    if( SDL_Init( SDL_INIT_VIDEO ) != 0 )
-//    {
-//        printf("failed to init SDL.\n");
-//        return 1;
-//    }
     SDL_Init( SDL_INIT_VIDEO );
 
-    //printf("success.\n");
-    
+#ifdef GLXEXT
+   glUniform1f = (PFNGLUNIFORM1FPROC) glXGetProcAddress("glUniform1f");
+   glUniform1i = (PFNGLUNIFORM1IPROC) glXGetProcAddress("glUniform1i");
+   glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) glXGetProcAddress("glGetUniformLocation");
+#endif
+
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-    SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL | SDL_FULLSCREEN);
-    //SDL_SetVideoMode( 800, 450, 32, SDL_OPENGL | SDL_FULLSCREEN);
+    //SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL | SDL_FULLSCREEN);
+    SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL);
     SDL_ShowCursor(0);
-
+#ifndef GLXEXT
     glewInit();
+#endif
+    sdlaudio.freq = 44100;
+    sdlaudio.format = AUDIO_S16; // 16 bit signed
+    sdlaudio.channels = 1;
+    sdlaudio.samples = 2048;
+    sdlaudio.callback = player_call;
+    sdlaudio.userdata = NULL;
 
-    wanted.freq = 44100;
-    wanted.format = AUDIO_S16; // 16 bit signed
-    wanted.channels = 1;
-    wanted.samples = 2048;
-    wanted.callback = player_call;
-    wanted.userdata = NULL;
-
-    SDL_OpenAudio(&wanted, NULL);
+    SDL_OpenAudio(&sdlaudio, NULL);
 
     SDL_PauseAudio(0);
 
-    //if (GLEW_OK != err)
-    //{
-    //    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-    //    return 1;
-    //}
-
-    //glDisable(GL_DEPTH_TEST);
-
     setShaders();
     setTextures();
+    
     GLint my_time = glGetUniformLocation(p, "t");
     CHECK_GL();
     GLint my_tex = glGetUniformLocation(p, "p");
@@ -175,10 +176,7 @@ void mystart()
             {
             case SDL_KEYDOWN:
             case SDL_QUIT:
-                //SDL_Quit();
-                //exit(0);
                 quit = 1;
-                //break;
             default:
                 break;
             }
@@ -196,6 +194,4 @@ void mystart()
     SDL_CloseAudio();
 
     SDL_Quit();
-    
-    //return 0;
 }
