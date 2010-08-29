@@ -1,0 +1,8 @@
+.history.*
+*.pyc
+*.o
+stachelfish
+*~
+demo.fsh.h
+demo.vsh.h
+tools/sstrip/sstrip
