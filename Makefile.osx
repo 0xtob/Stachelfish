@@ -2,11 +2,11 @@
 
 include Makefile.common
 
-LDFLAGS += -L/opt/local/lib -lSDLmain -lSDL -lGLEW -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
+LIB += -L/opt/local/lib -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
 
 small: $(EXEC)
 	strip $(EXEC)
 # TODO: OSX smallifications here!
 
 $(EXEC): opengl.o
-	$(CC) -Oz -I/opt/local/include opengl.c -o $(EXEC) $(LDFLAGS)
+	$(CC) -Oz -I/opt/local/include opengl.c -o $(EXEC) $(LDFLAGS) $(LIB)
