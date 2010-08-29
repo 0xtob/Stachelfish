@@ -12,7 +12,7 @@ small: $(EXEC)
 	cat lzunpack.header $(EXEC).lzma > $(EXEC)
 	ls -l $(EXEC)
 
-$(EXEC): opengl.o demo.vsh.h demo.fsh.h
+$(EXEC): opengl.o
 #	$(CC) $(CFLAGS) $(LDFLAGS) start.o opengl.o -o $(EXEC) $(LIB)
 	$(BOLD) -c -a $(LIB) -o $(EXEC) opengl.o
 

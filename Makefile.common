@@ -15,7 +15,7 @@ all: small
 start.o: start.asm
 	nasm -f elf64 start.asm
 
-opengl.o: opengl.c
+opengl.o: opengl.c demo.vsh.h demo.fsh.h
 	$(CC) $(CFLAGS) -c opengl.c -o opengl.o
 
 demo.vsh.h: demo.vsh
