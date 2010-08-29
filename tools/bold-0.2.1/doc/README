@@ -1,0 +1,228 @@
+.. HTML version generated with LC_ALL=C rst2html -t README > README.html
+
+.. |date| date:: %b %e, %Y
+
+Bold - The Byte Optimized Linker
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Author:    Amand Tihon
+:Contact:   <amand.tihon@alrj.org>
+:Version:   0.2.1
+:Date:      |date|
+:Copyright: GNU GPL version 3 + Exception, see copyright file.
+
+.. sectnum::
+
+.. contents:: Table of contents
+   :backlinks: none
+
+
+Abstract
+========
+
+Bold is an ELF linker, currently only targetting x86_64 under Linux. Being
+limited in capabilities, it should not be considered as an all-purpose linker.
+
+
+Rationale
+=========
+
+Bold's main purpose is to generate very small executable programs.
+
+While ``ld`` from the GNU binutils can do almost anything anyone would ever
+need, some specific goals need an awful lot of tweaking, or can simply not be
+achieved. Bold uses several tricks to reduce the size of the final executable
+binary.
+
+
+Getting Bold
+============
+
+You can download the tarball from http://www.alrj.org/projects/bold
+or get the latest development version with the following git command: ::
+
+  git clone http://git.alrj.org/git/bold.git
+
+A gitweb interface is also available at http://git.alrj.org/
+
+
+Requirements
+============
+
+Bold itself is entirely written in Python. There are no additionnal
+dependencies.
+
+The runtime library that contains the external symbols resolver is written
+in assembler (Intel syntax). An assembler like Nasm or Yasm is needed to
+recompile the source code into an object file.
+
+
+Installation
+============
+
+Go into Bold's directory, and run ::
+
+  python setup.py build
+
+Then, as root or using sudo, run ::
+
+  python setup.py install
+
+
+
+Using Bold
+==========
+
+Synopsys
+--------
+
+  bold [options] objfile...
+
+
+Description
+-----------
+
+Bold combines a number of object files, relocate their data and resolves their
+symbols references, in order to generate executable binaries.
+
+Bold has only one, very specific purpose: making small executables.
+
+Options
+-------
+
+--version
+  Show program's version and exit.
+
+-h, --help
+  Show help message and exit.
+
+-e SYMBOL, --entry=SYMBOL
+  Use SYMBOL as the explicit symbol for beginning execution of your program.
+  If ``--raw`` is specified, it defaults to ``_start``.
+
+-l LIBNAME, --library=LIBNAME
+  Link against the shared library specified by LIBNAME. Bold relies on python's
+  ctypes module to find the libraries. This option may be used any number of
+  times.
+
+-L DIRECTORY, --library-path=DIRECTORY
+  This option does nothing, and is present ony for compatibility reasons. It
+  MAY get implemented in the future, though. This option may be used any number
+  of times.
+
+-o FILE, --output=FILE
+  Set the output file name (default value is a.out).
+
+--raw
+  Don't include the builtin external symbols resolution code. This is
+  described in details further in this document.
+
+-c, --ccall
+  Make external symbols directly callable by C, without having to declare the
+  pointers on functions. This option adds 6 bytes for each externally defined
+  function. This is described in details further in this document.
+
+-a, --align
+  Align the wrappers for external symbols on an 8 byte boundary, to take
+  advantage of the RIP-relative addressing. This is described in details
+  further in this document.
+
+
+Notes
+-----
+
+The ``LD_PRELOAD`` environment variable may not always work (as expected or
+at all).
+
+The ``main()`` function is called without any argument. Its return code is used
+as exit code, though.
+
+
+Internals
+=========
+
+External symbols resolution
+---------------------------
+
+The "import by hash" method is from parapete, leblane, las, as described on
+http://www.pouet.net/topic.php?which=5392
+
+
+Calling from C
+--------------
+
+If you write your code in C and need to call the external symbols, you
+basically have two options. The first one is to redefine them (or define new
+ones) to call by pointers. For instance, ::
+
+  int SDL_Init(int);
+
+would become: ::
+
+  int (*SDL_Init)(int);
+
+Repeat it for all functions, or write a tool to automate it (hint: look at
+http://research.mercury-labs.org/ibh-i386-0.2.2.tar.gz for help).
+
+There's a second possibility however, and it's the one used by Bold when you
+specify the ``--ccall`` option: make the resolved symbol point, not to the
+address of the function, but to a JMP instruction to the actual address: ::
+
+  global SDL_Init
+  
+  .text
+  
+  SDL_Init:          jmp [rel _bold__SDL_Init]
+  SDL_SetVideoMode:  jmp [rel _bold__SDL_SetVideoMode]
+  
+  .bss
+  
+  _bold__SDL_Init          resq        ; Filled by the import by hash code
+  _bold__SDL_SetVideoMode  resq
+
+
+This approach takes 6 bytes (the JMP instruction) for each external function
+used.
+
+
+Aligning
+--------
+
+The x86_64 architecture has this nice thing called "RIP-relative addressing".
+If all the JMP instructions are in the same order than the pointers to the
+functions they refer to, having them aligned with the pointers would result
+in identical instructions. This is done with the ``--align`` option.
+
+Adding two null bytes between each JMP enlarges the final executable by
+2 x (number of function - 1) bytes, and may seem to go against our goal.
+However, the result is a repetition of the *same eight bytes*, something that
+can improve compression a lot!
+
+
+Additional Trick 1: DT_DEBUG
+----------------------------
+
+Bold declares a global symbol named ``_dt_debug``, that points to the value of
+the ``DT_DEBUG`` entry of the ``DYNAMIC`` table, for easy access. Just in case,
+the ``DYNAMIC`` table can also be reached using the global ``_DYNAMIC`` symbol.
+
+Additional Trick 2: Short DYNAMIC table
+---------------------------------------
+
+Executables generated by ``ld`` usually have a lot of entries in their
+``DYNAMIC`` table. Bold puts only the strict necessary:
+
+- One ``DT_NEEDED`` entry for each shared library to load (obviously).
+- A ``DT_SYMTAB`` entry, with null-pointer. Without this one, the interpreter
+  wouldn't do its job.
+- a ``DT_DEBUG`` entry, that will be used for symbol resolution.
+
+And that's it!
+
+
+Examples
+========
+
+The ``examples/`` directory contains a port of the *flow2* intro
+(http://www.pouet.net/prod.php?which=30589). Adding the dropper is left as an
+exercise for the reader.
