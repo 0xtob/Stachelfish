@@ -3,7 +3,7 @@
 include Makefile.common
 
 CFLAGS += -DGLXEXT `sdl-config --cflags` 
-LDFLAGS = -nostdlib -nostartfiles `sdl-config --libs` -lGL -lGLEW
+LIB += `sdl-config --libs` -lGL -lGLEW
 
 small: $(EXEC)
 #	strip $(EXEC)
