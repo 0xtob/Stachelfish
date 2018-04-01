@@ -141,7 +141,17 @@ int main()
 
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
     //SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL | SDL_FULLSCREEN);
-    SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL);
+    //SDL_SetVideoMode( 1280, 720, 32, SDL_OPENGL);
+    SDL_Window *window = SDL_CreateWindow(
+	"stachelfish",
+	SDL_WINDOWPOS_UNDEFINED,
+	SDL_WINDOWPOS_UNDEFINED,
+	1280,
+	720,
+	SDL_WINDOW_OPENGL
+    );
+    SDL_GL_CreateContext(window);
+
     SDL_ShowCursor(0);
 
     sdlaudio.freq = 44100;
