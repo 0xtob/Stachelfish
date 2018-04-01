@@ -5,14 +5,23 @@ include Makefile.common
 .PHONY: small
 
 CFLAGS += -Oz
-LDFLAGS += -framework SDL -framework Foundation -framework Carbon -framework AppKit -framework OpenGL
+#CFLAGS += $(sdl2-config --cflags --libs)
+LDFLAGS += -framework OpenGL
+#LDFLAGS += -I/Library/Frameworks/SDL2.framework/Headers
+#LDFLAGS += -F/Library/Frameworks
+#LDFLAGS += -framework AppKit
+#LDFLAGS += -framework Foundation
+#LDFLAGS += -framework Carbon
+LDFLAGS += -framework SDL2
 
 small: $(EXEC)
 	strip $(EXEC)
 	rm -f $(EXEC).lzma
 	lzma --best --keep $(EXEC)
 	cat lzunpack.header $(EXEC).lzma > $(EXEC).tiny
+	chmod +x $(EXEC).tiny
 	ls -l $(EXEC).tiny
 
 $(EXEC): opengl.o
-	$(CC) $(CFLAGS) opengl.o SDLMain.m -o $(EXEC) $(LDFLAGS) $(LIB)
+	#$(CC) $(CFLAGS) opengl.o SDLMain.m -o $(EXEC) $(LDFLAGS) $(LIB)
+	 $(CC) $(CFLAGS) opengl.o -o $(EXEC) $(LDFLAGS) $(LIB)
