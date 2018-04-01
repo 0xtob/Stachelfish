@@ -8,7 +8,7 @@
 #include <GL/gl.h>
 #endif
 
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 
 //#include <stdlib.h> // this is in theory needed for random(). why comment it out?
 #include <math.h>
@@ -43,7 +43,7 @@ GLuint tex;
 
 SDL_AudioSpec sdlaudio;
 
-inline void setTextures()
+void setTextures()
 {
     unsigned char data[512];
     int i;
@@ -188,7 +188,8 @@ int main()
         glRecti(-1, -1, 1, 1);
         CHECK_GL();
 
-        SDL_GL_SwapBuffers();
+        //SDL_GL_SwapBuffers();	//	old SDL...
+	SDL_GL_SwapWindow(window);
     }
 
     SDL_CloseAudio();
